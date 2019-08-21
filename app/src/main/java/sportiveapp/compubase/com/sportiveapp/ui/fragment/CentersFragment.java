@@ -47,7 +47,7 @@ public class CentersFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         setupRecycler();
-        fetchData();
+//        fetchData();
         return view;
     }
 
@@ -60,24 +60,24 @@ public class CentersFragment extends Fragment {
         adapter.notifyDataSetChanged();
 
     }
-    private void fetchData (){
-        List<CentersModel> centersModels = new ArrayList<>();
-
-        img = new int[]{R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
-                R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
-                R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background};
-        num = new String[]{"40 km", "50 km", "60 km", "30 km", "20 km", "10 km", "5 km", "70 km", "80 km"};
-        name = new String[]{"name 1", "name 2", "name 3", "name 4", "name 5", "name 6", "name 7", "name 8", "name 9"};
-
-        for ( i = 0; i <img.length ; i++) {
-            centersModels.add(new CentersModel(img[i],num[i],name[i]));
-
-//            ratingBar.setRating(num[i]);
-        }
-
-        adapter.setData(centersModels);
-        adapter.notifyDataSetChanged();
-    }
+//    private void fetchData (){
+//        List<CentersModel> centersModels = new ArrayList<>();
+//
+//        img = new int[]{R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
+//                R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
+//                R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background};
+//        num = new String[]{"40 km", "50 km", "60 km", "30 km", "20 km", "10 km", "5 km", "70 km", "80 km"};
+//        name = new String[]{"name 1", "name 2", "name 3", "name 4", "name 5", "name 6", "name 7", "name 8", "name 9"};
+//
+//        for ( i = 0; i <img.length ; i++) {
+//            centersModels.add(new CentersModel(img[i],num[i],name[i]));
+//
+////            ratingBar.setRating(num[i]);
+//        }
+//
+//        adapter.setData(centersModels);
+//        adapter.notifyDataSetChanged();
+//    }
 
     @Override
     public void onDestroyView() {

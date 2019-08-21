@@ -30,7 +30,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/center_name"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textSize="24sp"
                     android:id="@+id/txt_name_of_center"
@@ -42,7 +42,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/_40_km"
+                    android:text=""
                     android:id="@+id/txt_km"
                     android:textSize="16sp"
                     android:drawableStart="@drawable/ic_location_on_black_24dp"

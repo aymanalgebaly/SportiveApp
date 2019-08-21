@@ -15,11 +15,13 @@ import java.util.List;
 
 import sportiveapp.compubase.com.sportiveapp.R;
 import sportiveapp.compubase.com.sportiveapp.ui.model.ActivitesModel;
+import sportiveapp.compubase.com.sportiveapp.ui.model.UserActivity;
 
 public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolderActities> {
 
     private Context context;
     private List<ActivitesModel>activitesModelList;
+    private List<UserActivity>userActivityList;
 
     public ActivitiesAdapter(Context context) {
         this.context = context;
@@ -35,18 +37,18 @@ public class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolderActities viewHolderActities, int i) {
 
-        ActivitesModel activitesModel = activitesModelList.get(i);
+        UserActivity userActivity = userActivityList.get(i);
 
-        viewHolderActities.name.setText(activitesModel.getName());
-        viewHolderActities.txt.setText(activitesModel.getMsg());
-        viewHolderActities.title.setText(activitesModel.getTitle());
+//        viewHolderActities.name.setText(userActivity.());
+        viewHolderActities.txt.setText(userActivity.getMessage());
+        viewHolderActities.title.setText(userActivity.getType());
 
-        Picasso.get().load(activitesModel.getImg()).into(viewHolderActities.imageView);
+//        Picasso.get().load(activitesModel.getImg()).into(viewHolderActities.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return activitesModelList != null ? activitesModelList.size():0;
+        return userActivityList != null ? userActivityList.size():0;
     }
 
     public void setData(List<ActivitesModel> activitesModels) {

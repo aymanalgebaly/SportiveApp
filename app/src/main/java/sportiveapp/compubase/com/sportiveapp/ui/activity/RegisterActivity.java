@@ -1,5 +1,6 @@
 package sportiveapp.compubase.com.sportiveapp.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -78,12 +80,14 @@ public class RegisterActivity extends AppCompatActivity {
     @BindView(R.id.text_login)
     TextView textLogin;
 
-    private int PLACE_PICKER = 1 ;
-    private String userName,userMail,userphone,userpass;
+    private String userName, userMail, userphone, userpass;
+    int PLACE_PICKER_REQUEST = 1;
 
-    private String radio ;
+    private String radio;
     private SharedPreferences preferences;
     private String string;
+
+    int MAP_BUTTON_REQUEST_CODE = 1;
 
 
     @Override
@@ -95,15 +99,17 @@ public class RegisterActivity extends AppCompatActivity {
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-
     }
+
     @OnClick({R.id.center_btn, R.id.user_btn, R.id.location, R.id.BTN_signUp_registar, R.id.text_login})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.center_btn:
+                radio = "center";
                 location.setVisibility(View.VISIBLE);
                 break;
             case R.id.user_btn:
+                radio = "user";
                 location.setVisibility(View.GONE);
                 break;
             case R.id.location:
@@ -111,18 +117,63 @@ public class RegisterActivity extends AppCompatActivity {
                 break;
             case R.id.BTN_signUp_registar:
 
-                Validate();
-//                if (centerBtn.isChecked()){
-//                    radio = "user";
-//                    startActivity(new Intent(RegisterActivity.this,CenterHomeActivity.class));
-//                }else if (userBtn.isChecked()){
-//                    radio = "center";
-//                    startActivity(new Intent(RegisterActivity.this,HomeActivity.class));
-//                }
+                if (centerBtn.isChecked()) {
+                    ValidateCenter();
+                } else if (userBtn.isChecked()) {
+                    Validate();
+                }
+
                 break;
             case R.id.text_login:
-                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                 break;
+        }
+    }
+
+    private void ValidateCenter() {
+        userName = fullName.getText().toString();
+        userMail = email.getText().toString();
+        userphone = phoneNum.getText().toString();
+        userpass = password.getText().toString();
+
+        if (TextUtils.isEmpty(userName)) {
+            fullName.setError("User name is required");
+        } else if (TextUtils.isEmpty(userMail)) {
+            email.setError("Email is required");
+        } else if (TextUtils.isEmpty(userphone)) {
+            phoneNum.setError("Birthday is required");
+        } else if (TextUtils.isEmpty(userpass)) {
+            password.setError("Blood Type is required");
+        } else {
+            Retrofit retrofit = RetrofitClient.getInstant();
+            API api = retrofit.create(API.class);
+            Call<ResponseBody> responseBodyCall = api.UserRegister(userName, userMail, userpass, userphone, radio, 0.0000
+                    , 0.0000, "image", "famous", "des");
+            responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                    if (response.isSuccessful()) {
+                        try {
+                            assert response.body() != null;
+                            String string = response.body().string();
+
+                            Toast.makeText(RegisterActivity.this, string, Toast.LENGTH_SHORT).show();
+
+                            if (string.equals("True")) {
+                                startActivity(new Intent(RegisterActivity.this, CenterHomeActivity.class));
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(RegisterActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -144,18 +195,24 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             Retrofit retrofit = RetrofitClient.getInstant();
             API api = retrofit.create(API.class);
-            Call<ResponseBody> responseBodyCall = api.UserRegister(userName, userMail, userpass, userphone);
+            Call<ResponseBody> responseBodyCall = api.UserRegister(userName, userMail, userpass, userphone, radio, 0.0000
+                    , 0.0000, "image", "famous", "des");
             responseBodyCall.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                    try {
-                        assert response.body() != null;
-                        String string = response.body().string();
+                    if (response.isSuccessful()) {
+                        try {
+                            assert response.body() != null;
+                            String string = response.body().string();
 
-                        Toast.makeText(RegisterActivity.this, string, Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                            if (string.equals("True")) {
+                                sharedLogin();
+                                startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -185,28 +242,49 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void placePacker() {
+
+
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
         try {
-            startActivityForResult(builder.build(RegisterActivity.this),PLACE_PICKER);
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
         } catch (GooglePlayServicesRepairableException e) {
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
         }
+
+//        Intent locationPickerIntent = new LocationPickerActivity.Builder()
+//                .withLocation(41.4036299, 2.1743558)
+//                .withSearchZone("es_ES")
+//                .shouldReturnOkOnBackPressed()
+//                .withStreetHidden()
+//                .withCityHidden()
+//                .withZipCodeHidden()
+//                .withSatelliteViewHidden()
+//                .build(RegisterActivity.this);
+//
+//        startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE);
+
+//        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+//        try {
+//            startActivityForResult(builder.build(RegisterActivity.this),PLACE_PICKER);
+//        } catch (GooglePlayServicesRepairableException e) {
+//            e.printStackTrace();
+//        } catch (GooglePlayServicesNotAvailableException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PLACE_PICKER){
-            if (resultCode == RESULT_OK){
-                Place place = PlacePicker.getPlace(this, data);
-                StringBuilder stringBuilder = new StringBuilder();
-                String  latitude = String.valueOf(place.getLatLng().latitude);
-                String  longitude = String.valueOf(place.getLatLng().longitude);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
 
-                stringBuilder.append(latitude);
-                stringBuilder.append(longitude);
-                location.setText(stringBuilder);
+                location.setText(toastMsg);
             }
         }
     }

@@ -11,45 +11,57 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sportiveapp.compubase.com.sportiveapp.R;
+import sportiveapp.compubase.com.sportiveapp.ui.model.Center;
 import sportiveapp.compubase.com.sportiveapp.ui.model.CentersModel;
 
 public class CentersAdapter extends RecyclerView.Adapter<CentersAdapter.ViewHolderCenters> {
 
     private Context context;
-    private List<CentersModel>centersModelList;
+    private List<Center>centerList;
+
+    public CentersAdapter(List<Center> centerList) {
+        this.centerList = centerList;
+    }
+
+    public CentersAdapter(Context context, List<Center> centerList) {
+        this.context = context;
+        this.centerList = centerList;
+    }
 
     public CentersAdapter(Context context) {
         this.context = context;
     }
 
+
     @NonNull
     @Override
     public ViewHolderCenters onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(context).inflate(R.layout.centers_rcv_design, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.centers_rcv_design, viewGroup, false);
         return new ViewHolderCenters(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolderCenters viewHolderCenters, int i) {
 
-        CentersModel centersModel = centersModelList.get(i);
+        Center center = centerList.get(i);
 
-        viewHolderCenters.name.setText(centersModel.getName());
-        viewHolderCenters.km.setText(centersModel.getKm());
+        viewHolderCenters.name.setText(center.getName());
+//        viewHolderCenters.km.setText(center.);
 
 //        Picasso.get().load(centersModel.getImg()).into(viewHolderCenters.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return centersModelList != null ? centersModelList.size():0;
+        return centerList != null ? centerList.size():0;
     }
 
-    public void setData(List<CentersModel> centersModels) {
-        this.centersModelList = centersModels;
+    public void setTOAdapter(List<Center> centers) {
+        this.centerList = centers;
     }
 
     public class ViewHolderCenters extends RecyclerView.ViewHolder {

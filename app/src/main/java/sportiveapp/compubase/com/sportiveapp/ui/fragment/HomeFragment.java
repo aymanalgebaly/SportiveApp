@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,19 +15,33 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 import sportiveapp.compubase.com.sportiveapp.R;
 import sportiveapp.compubase.com.sportiveapp.ui.adapter.CentersAdapter;
+import sportiveapp.compubase.com.sportiveapp.ui.api.API;
+import sportiveapp.compubase.com.sportiveapp.ui.helper.RetrofitClient;
+import sportiveapp.compubase.com.sportiveapp.ui.model.Center;
 import sportiveapp.compubase.com.sportiveapp.ui.model.CentersModel;
 
 
@@ -53,6 +68,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private int[] img;
     private String[]num,name;
     private int i;
+    private int page;
+    private List<Center>centers = new ArrayList<>();
+
+    private ArrayList<Center> centerArrayList = new ArrayList<>();
 
 
     public HomeFragment() {
@@ -101,27 +120,79 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rcvHome.setLayoutManager(linearLayoutManager);
-        adapter = new CentersAdapter(getActivity());
-        rcvHome.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+//        adapter = new CentersAdapter(getActivity());
+//        rcvHome.setAdapter(adapter);
 
     }
     private void fetchData (){
-        List<CentersModel> centersModels = new ArrayList<>();
+        Call<ResponseBody> call2 = RetrofitClient.getInstant().create(API.class).ListOfCenters();
 
-        img = new int[]{R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
-                R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
-                R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background};
-        num = new String[]{"40 km", "50 km", "60 km", "30 km", "20 km", "10 km", "5 km", "70 km", "80 km"};
-        name = new String[]{"name 1", "name 2", "name 3", "name 4", "name 5", "name 6", "name 7", "name 8", "name 9"};
+        call2.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-        for ( i = 0; i <img.length ; i++) {
-            centersModels.add(new CentersModel(img[i],num[i],name[i]));
+                GsonBuilder builder = new GsonBuilder();
+                Gson gson = builder.create();
 
-//            ratingBar.setRating(num[i]);
+
+                try {
+                    assert response.body() != null;
+                    List<Center> centerList = Arrays.asList(gson.fromJson(response.body().string(), Center[].class));
+
+//                    Toast.makeText(getActivity(), centerList.get(0).getName(), Toast.LENGTH_SHORT).show();
+
+                    if (response.isSuccessful()){
+
+                        for (int j = 0; j <centerList.size() ; j++) {
+
+                            Center center = new Center();
+
+                            center.setName(centerList.get(j).getName());
+
+                            centerArrayList.add(center);
+                        }
+                        adapter = new CentersAdapter(centerArrayList);
+                        rcvHome.setAdapter(adapter);
+//                        adapter.setTOAdapter(centerList);
+                        adapter.notifyDataSetChanged();
+
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+
+                Log.i("onFailure: ",t.getMessage());
+            }
+        });
+        
         }
 
-        adapter.setData(centersModels);
-        adapter.notifyDataSetChanged();
-    }
+//    private void viewData(ResponseBody body) {
+//        List<Center> centerList = new ArrayList<>();
+//
+//        for (int j = 0; j <centers.size() ; j++) {
+//
+//            center.setName(centerList.get(i).getName());
+//
+//            centerList.add(center);
+//        }
+//        adapter.setTOAdapter(centerList);
+//        adapter.notifyDataSetChanged();
+//    }
+
+//    private void viewData(Center body) {
+//        Center center = new Center();
+//        center.setName(centers.);
+//
+//        centers.add(center);
+//
+//        adapter.setTOAdapter(centers);
+//    }
 }
