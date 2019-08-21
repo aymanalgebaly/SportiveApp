@@ -66,8 +66,6 @@ public class LoginActivity extends AppCompatActivity {
             case R.id.text_forgot_pass:
                 break;
             case R.id.BTN_signIn_login:
-                startActivity(new Intent(LoginActivity.this,HomeActivity.class));
-
                 userLogin();
                 break;
             case R.id.BTN_signup_log:
@@ -94,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             sharedLogin();
 
+                            startActivity(new Intent(LoginActivity.this,HomeActivity.class));
 
                         } catch (IOException e) {
                             e.printStackTrace();
